@@ -51,3 +51,12 @@ void I2C0_send(uint8_t address, uint8_t msb, uint8_t lsb) {
     while (I2C0_MCS_R & 0x01);                            // Wait for transfer to complete
     if (I2C0_MCS_R & 0x02) return;                        // If an error occurs, exit
 }
+
+// Generate delay in microseconds
+void delay_us(int us) {
+    STRELOAD = SYSTICK_RELOAD(us);                        // Load value for the specified delay
+    STCURRENT = 0;                                        // Clear current value register
+    STCTRL |= ENABLE | CLKINT;                            // Start SysTick
+    while ((STCTRL & (1 << 16)) == 0);                    // Wait for the count flag
+    STCTRL &= ~ENABLE;                                    // Disable SysTick
+}
