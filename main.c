@@ -53,7 +53,8 @@ void I2C0_send(uint8_t address, uint8_t msb, uint8_t lsb) {
 }
 
 // Generate delay in microseconds
-void delay_us(int us) {
+void delay_us(int us) 
+{
     STRELOAD = SYSTICK_RELOAD(us);                        // Load value for the specified delay
     STCURRENT = 0;                                        // Clear current value register
     STCTRL |= ENABLE | CLKINT;                            // Start SysTick
