@@ -13,3 +13,11 @@
 #define CLKINT (1 << 2)                                   // Use system clock
 #define CLOCK_HZ 16000000                                 // System clock frequency in Hz
 #define SYSTICK_RELOAD(us) ((CLOCK_HZ / 1000000) * (us) - 1) // Calculates reload value for given microseconds
+
+
+// Configure SysTick for delays
+void systick_config(void) {
+    STRELOAD = SYSTICK_RELOAD(1000);                      // Set reload for 1 ms intervals
+    STCTRL |= ENABLE | CLKINT;                            // Enable SysTick with system clock
+    STCURRENT = 0;                                        // Clear current value register
+}
