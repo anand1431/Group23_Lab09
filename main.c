@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <tm4c123gh6pm.h>
 
+
 // SysTick Register Definitions
 #define STCTRL *((volatile uint32_t *) 0xE000E010)        // Control and Status Register
 #define STRELOAD *((volatile uint32_t *) 0xE000E014)      // Reload Value Register
