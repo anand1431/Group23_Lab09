@@ -21,3 +21,33 @@ void systick_config(void) {
     STCTRL |= ENABLE | CLKINT;                            // Enable SysTick with system clock
     STCURRENT = 0;                                        // Clear current value register
 }
+
+// Initialize I2C0 for communication
+void I2C0_init(void) {
+    SYSCTL_RCGCI2C_R |= 0x01;                             // Enable clock for I2C0 module
+    SYSCTL_RCGCGPIO_R |= 0x02;                            // Enable clock for Port B
+
+    while ((SYSCTL_PRGPIO_R & 0x02) == 0);                // Wait until Port B is ready
+
+    GPIO_PORTB_AFSEL_R |= 0x0C;                           // Enable alternate function for PB2, PB3
+    GPIO_PORTB_ODR_R |= 0x08;                             // Set PB3 (SDA) as open-drain
+    GPIO_PORTB_DEN_R |= 0x0C;                             // Enable digital function on PB2, PB3
+    GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R & ~0xFF00) | 0x3300; // Assign I2C function to PB2, PB3
+
+    I2C0_MCR_R = 0x10;                                    // Configure I2C0 as master
+    I2C0_MTPR_R = 0x07;                                   // Set I2C clock frequency
+}
+
+// Send data over I2C0
+void I2C0_send(uint8_t address, uint8_t msb, uint8_t lsb) {
+    I2C0_MSA_R = (address << 1);                          // Set slave address and write mode
+    I2C0_MDR_R = msb;                                     // Send the MSB
+    I2C0_MCS_R = 0x03;                                    // Start and send
+    while (I2C0_MCS_R & 0x01);                            // Wait for transfer to complete
+    if (I2C0_MCS_R & 0x02) return;                        // If an error occurs, exit
+
+    I2C0_MDR_R = lsb;                                     // Send the LSB
+    I2C0_MCS_R = 0x05;                                    // Send and stop
+    while (I2C0_MCS_R & 0x01);                            // Wait for transfer to complete
+    if (I2C0_MCS_R & 0x02) return;                        // If an error occurs, exit
+}
